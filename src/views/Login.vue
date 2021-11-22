@@ -29,7 +29,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 
 export default {
-  name: "Login",
+  name: 'Login',
   setup() {
     const store = useStore()
     const router = useRouter()
@@ -38,7 +38,7 @@ export default {
       password: ''
     })
 
-    const submitHandler = async () => {
+    const submitHandler = async function () {
       try {
         await store.dispatch('Login', form)
         if (store.getters.isAuth) {
