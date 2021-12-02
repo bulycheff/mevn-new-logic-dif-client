@@ -1,4 +1,7 @@
 <template>
+  <div @click="router.replace(`/days/`)" class="backward-to-days-list">
+    <i class="material-icons">arrow_back_ios</i>
+  </div>
   <Loader v-if="isLoading"/>
   <div v-else class="clients">
     <div class="card">
@@ -44,10 +47,12 @@ import Loader from '@/components/Loader'
 import { useStore } from 'vuex'
 import ClientAdd from '@/components/ClientAdd'
 import M from 'materialize-css'
+import { useRouter } from 'vue-router'
 
 export default {
   components: { ClientAdd, Loader },
   setup() {
+    const router = useRouter()
     const store = useStore()
     const isLoading = ref(true)
     const isAddFormOpen = ref(false)
@@ -84,7 +89,8 @@ export default {
       isAddFormOpen,
       closeFormAndReloadData,
       openedDay,
-      dateFilter
+      dateFilter,
+      router
     }
   }
 
@@ -96,5 +102,9 @@ export default {
   cursor: pointer;
   margin-top: 10px;
 
+}
+
+.backward-to-days-list {
+  cursor: pointer;
 }
 </style>

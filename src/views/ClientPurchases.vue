@@ -1,5 +1,8 @@
 <template>
   <div class="client-purchases">
+    <div @click="router.replace(`/clients/`)" class="backward-to-clients-list">
+      <i class="material-icons">arrow_back_ios</i>
+    </div>
     <div class="card-panel client-purchases__title">
       <p>{{ client.name }}</p>
       Открыт: {{ opened_at }}.
@@ -15,7 +18,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { computed, onBeforeMount } from 'vue'
 import ClientProgram from '@/components/ClientProgram'
 import ClientBar from '@/components/ClientBar'
@@ -49,7 +52,8 @@ export default {
       client,
       dateFilter,
       total: computed(() => store.getters.purchaseListTotal),
-      opened_at
+      opened_at,
+      router: useRouter()
     }
 
   }
@@ -81,5 +85,9 @@ export default {
     -4px 3px #cdd2d5,
 
   }
+}
+
+.backward-to-clients-list {
+  cursor: pointer;
 }
 </style>
