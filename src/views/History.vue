@@ -72,8 +72,8 @@
 <script>
 
 import { useStore } from 'vuex'
-import { computed, onBeforeMount, onMounted, reactive, ref } from 'vue'
-import { dateTimeFilter, formatPeriod } from '@/utils'
+import { computed, onBeforeMount, reactive, ref, watch } from 'vue'
+import { dateTimeFilter, formatPeriod, getLastWeekPeriod, convertDateForApiRequest } from '@/utils'
 import { useRoute, useRouter } from 'vue-router'
 import Loader from '@/components/Loader'
 import Datepicker from 'vue3-date-time-picker'
@@ -86,14 +86,19 @@ export default {
     const route = useRoute()
     const router = useRouter()
 
-    const datePickerDates = ref()
+    const datePickerDates = getLastWeekPeriod()
+    watch(computed(() => datePickerDates.value[0]), async () => {
+      await store.dispatch('DAYS_HISTORY_NEW_FETCH', [convertDateForApiRequest(datePickerDates.value[0]), convertDateForApiRequest(datePickerDates.value[1])])
+      pagination.setPages()
+    })
 
     const isLoading = ref(true)
+    const daysAmount = ref(computed(() => store.getters.daysAmount))
+    const pagesAmount = ref(computed(() => Math.ceil(daysAmount.value / pagination.maxDaysOnPage)))
 
     onBeforeMount(async () => {
-      await store.dispatch('DAYS_HISTORY_FETCH')
-      const daysAmount = store.getters.daysAmount
-      pagination.setPages(daysAmount)
+      await store.dispatch('DAYS_HISTORY_NEW_FETCH', [convertDateForApiRequest(datePickerDates.value[0]), convertDateForApiRequest(datePickerDates.value[1])])
+      pagination.setPages(daysAmount.value)
       const page = route.params.id
 
       if ((page > pagination.pages.length) || (!page)) {
@@ -103,30 +108,23 @@ export default {
       isLoading.value = false
     })
 
-    onMounted(() => {
-      const startDate = new Date((new Date()).setHours(0, 0, 0, 0))
-      const endDate = new Date(startDate)
-      startDate.setDate(startDate.getDate() - 7)
-      datePickerDates.value = [startDate, endDate]
-    })
-
     const pagination = reactive({
-      itemPerPage: 3,
+      maxDaysOnPage: 3,
       currentPage: computed(() => parseInt(route.params.id)),
-      pages: [],
-      setPages: function (daysAmount) {
-        const pagesAmount = Math.ceil(daysAmount / this.itemPerPage)
-        let daysCopy = daysHistory.value
-
+      pages: computed(() => {
+        const daysCopy = ref(store.getters.daysHistory)
         let newPagesArr = []
-        for (let i = 1; i < pagesAmount + 1; i++) {
-          let part = daysCopy.splice(0, this.itemPerPage)
+        for (let i = 1; i < pagesAmount.value + 1; i++) {
+          let part = daysCopy.value.splice(0, pagination.maxDaysOnPage)
           newPagesArr.push({
             number: i,
             days: part
           })
         }
-        this.pages = newPagesArr
+        return newPagesArr
+      }),
+      setPages: function () {
+
       },
       oneStep: (direction) => {
         if (!direction) return
@@ -140,10 +138,8 @@ export default {
       }
     })
 
-    const daysHistory = computed(() => {
-      let days = store.getters.daysHistory
-      return days.sort((a, b) => new Date(b.opened_at) - new Date(a.opened_at))
-    })
+    const daysHistory = computed(() => store.getters.daysHistory)
+
 
     return {
       daysHistory,
@@ -151,7 +147,9 @@ export default {
       pagination,
       isLoading,
       datePickerDates,
-      formatPeriod
+      formatPeriod,
+      daysAmount,
+      pagesAmount
     }
   }
 

@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 function dateFilter(value, format = 'date') {
   // console.log(value)
   const options = {}
@@ -54,9 +56,31 @@ function formatPeriod([dateStart, dateEnd]) {
   return `${formatted(dateStart)} — ${formatted(dateEnd)}`
 }
 
+function convertDateForApiRequest(dateTime) {
+  let fullDate = new Date(dateTime)
+  let date = fullDate.getDate()
+  date = parseInt(date) < 10 ? '0' + date : date
+  let month = fullDate.getMonth() + 1
+  month = parseInt(month) < 10 ? '0' + month : month
+  let year = fullDate.getFullYear()
+  return `${year}-${month}-${date}`
+}
+
+function getLastWeekPeriod() {
+  const datesPeriod = ref()
+  const startDate = new Date((new Date()).setHours(0, 0, 0, 0))
+  const endDate = new Date(startDate)
+  startDate.setDate(startDate.getDate() - 7)
+  datesPeriod.value = [startDate, endDate]
+
+  return datesPeriod
+}
+
 export {
   dateTimeFilter,
   dateFilter,
   WithoutTime,
-  formatPeriod
+  formatPeriod,
+  getLastWeekPeriod,
+  convertDateForApiRequest
 }
