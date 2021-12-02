@@ -1,5 +1,6 @@
 <template>
-  <div class="client-purchases">
+  <Loader v-if="isLoading"/>
+  <div v-else-if="!isLoading" class="client-purchases">
     <div @click="router.replace(`/clients/`)" class="backward-to-clients-list">
       <i class="material-icons">arrow_back_ios</i>
     </div>
@@ -19,15 +20,17 @@
 <script>
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onBeforeMount } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import ClientProgram from '@/components/ClientProgram'
 import ClientBar from '@/components/ClientBar'
 import { dateFilter } from '@/utils'
 import M from 'materialize-css'
+import Loader from '@/components/Loader'
 
 export default {
-  components: { ClientBar, ClientProgram },
+  components: { ClientBar, ClientProgram, Loader },
   setup() {
+    const isLoading = ref(true)
     const route = useRoute()
     const store = useStore()
     const id = computed(() => route.params.id)
@@ -46,6 +49,7 @@ export default {
       await store.dispatch('FetchEmployeeListFromServer')
       await store.dispatch('ProgramFetchAllFromServer')
       M.AutoInit()
+      isLoading.value = false
     })
 
     return {
@@ -53,7 +57,8 @@ export default {
       dateFilter,
       total: computed(() => store.getters.purchaseListTotal),
       opened_at,
-      router: useRouter()
+      router: useRouter(),
+      isLoading
     }
 
   }
