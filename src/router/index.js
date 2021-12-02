@@ -38,6 +38,17 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
+    path: '/history/:id',
+    name: 'History',
+    component: () => import('@/views/History'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/history/',
+    redirect: '/history/1',
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
     path: '/admin/:name',
     name: 'AdminItems',
     component: () => import('@/views/Admin'),

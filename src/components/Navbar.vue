@@ -17,6 +17,9 @@
           <router-link to="/admin/userlist">Админ панель</router-link>
         </li>
         <li v-show="isAuth && isAdmin">
+          <router-link to="/history/1">История</router-link>
+        </li>
+        <li v-show="isAuth && isAdmin">
           <router-link to="/categorize">Другое</router-link>
         </li>
         <li v-show="!isAuth">
@@ -41,6 +44,9 @@
     </li>
     <li v-show="isAuth && isAdmin">
       <router-link to="/admin/userlist">Админ панель</router-link>
+    </li>
+    <li v-show="isAuth && isAdmin">
+      <router-link to="/history/1">История</router-link>
     </li>
     <li v-show="isAuth && isAdmin">
       <router-link to="/categorize">Другое</router-link>

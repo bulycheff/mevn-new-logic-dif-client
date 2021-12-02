@@ -6,6 +6,7 @@ import admin from './modules/admin'
 import employee from './modules/employee'
 import bar from './modules/bar'
 import program from './modules/program'
+import history from './modules/history'
 
 import card from '@/store/modules/cat/card'
 import cash from '@/store/modules/cat/cash'
@@ -38,6 +39,7 @@ export default createStore({
     service,
 
     purchase,
-    expense
+    expense,
+    history
   }
 })
