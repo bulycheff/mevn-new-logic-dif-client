@@ -44,7 +44,11 @@
 
     <div class="content-block">
 
-      <table>
+      <div v-if="isTableEmpty" class="empty-table">
+        <h5>В выборке отсутствуют элементы. <br> Попрбуйте выбрать другие даты.</h5>
+      </div>
+
+      <table v-else-if="!isTableEmpty">
         <thead>
         <tr>
           <th>Имя сотрудника</th>
@@ -87,18 +91,26 @@ export default {
     const router = useRouter()
 
     const datePickerDates = getLastWeekPeriod()
-    watch(computed(() => datePickerDates.value[0]), async () => {
-      await store.dispatch('DAYS_HISTORY_NEW_FETCH', [convertDateForApiRequest(datePickerDates.value[0]), convertDateForApiRequest(datePickerDates.value[1])])
-      pagination.setPages()
+
+    watch(datePickerDates, async () => {
+      await router.replace(`/history/1`)
+      if (datePickerDates.value === null) {
+        console.log('RESETED')
+        store.commit('DaysHistory_SET', [])
+        store.commit('DaysHistoryNew_SET', [])
+      } else {
+        await store.dispatch('DAYS_HISTORY_NEW_FETCH', [convertDateForApiRequest(datePickerDates.value[0]), convertDateForApiRequest(datePickerDates.value[1])])
+      }
     })
 
     const isLoading = ref(true)
     const daysAmount = ref(computed(() => store.getters.daysAmount))
     const pagesAmount = ref(computed(() => Math.ceil(daysAmount.value / pagination.maxDaysOnPage)))
+    const isTableEmpty = ref(computed(() => (daysAmount.value === 0)))
+
 
     onBeforeMount(async () => {
       await store.dispatch('DAYS_HISTORY_NEW_FETCH', [convertDateForApiRequest(datePickerDates.value[0]), convertDateForApiRequest(datePickerDates.value[1])])
-      pagination.setPages(daysAmount.value)
       const page = route.params.id
 
       if ((page > pagination.pages.length) || (!page)) {
@@ -123,9 +135,7 @@ export default {
         }
         return newPagesArr
       }),
-      setPages: function () {
 
-      },
       oneStep: (direction) => {
         if (!direction) return
         let id = route.params.id
@@ -140,7 +150,6 @@ export default {
 
     const daysHistory = computed(() => store.getters.daysHistory)
 
-
     return {
       daysHistory,
       dateTimeFilter,
@@ -149,7 +158,8 @@ export default {
       datePickerDates,
       formatPeriod,
       daysAmount,
-      pagesAmount
+      pagesAmount,
+      isTableEmpty
     }
   }
 
