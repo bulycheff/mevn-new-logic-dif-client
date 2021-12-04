@@ -62,13 +62,19 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, onUpdated } from 'vue'
 import { useRouter } from 'vue-router'
+import M from 'materialize-css'
 
 export default {
   setup() {
     const router = useRouter()
     const store = useStore()
+
+    onUpdated(() => {
+      let elems = document.querySelectorAll('.sidenav')
+      M.Sidenav.init(elems, {})
+    })
 
     const logOut = () => {
       store.dispatch('Logout')
@@ -100,4 +106,5 @@ export default {
   cursor: pointer;
   font-weight: 500;
 }
+
 </style>

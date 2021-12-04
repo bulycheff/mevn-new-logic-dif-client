@@ -38,10 +38,14 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .card-action {
   background: #dbdbdb;
 }
 
+body>div.app>div.toast-container>div.toast {
+  display: flex !important;
+  top: 35px !important;
+}
 
 </style>

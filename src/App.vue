@@ -6,20 +6,24 @@
 </template>
 
 <script>
-import { onMounted } from 'vue'
+import { onBeforeMount } from 'vue'
 import Navbar from '@/components/Navbar'
 import { useStore } from 'vuex'
+import router from '@/router'
 
 export default {
   components: { Navbar },
   setup() {
     const store = useStore()
 
-    onMounted(async () => {
+    onBeforeMount(async () => {
       try {
-        await store.dispatch('OnAppMounted')
+        await store.dispatch('CheckTokenAndUserBeforeMountApp')
       } catch (e) {
         console.log(e)
+      }
+      if(!store.getters.user) {
+        await router.replace('/login')
       }
     })
 
