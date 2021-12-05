@@ -11,9 +11,8 @@
           <tr>
             <th>#</th>
             <th>Имя клиента</th>
-            <th>Статус</th>
             <th>Дата начала</th>
-            <th>Дата завершения</th>
+            <th>Сумма</th>
           </tr>
           </thead>
 
@@ -25,7 +24,6 @@
                 {{ cl.name }}
               </router-link>
             </td>
-            <td>{{ cl.status }}</td>
             <td>{{ dateFilter(cl.opened_at, 'datetime') }}</td>
             <td>{{ cl.closed_at }}</td>
           </tr>
@@ -65,6 +63,7 @@ export default {
         dayId: openedDay.value._id
       }
       await store.dispatch('ClientFetchAllFromServer', payload)
+      await store.dispatch('ClientFetchAgrByDayId', openedDay.value._id)
     }
 
     onBeforeMount(async () => {

@@ -1,27 +1,46 @@
 <template>
-  <div v-if="loading" class="loading">
+  <div v-if="isLoading" class="loading">
     <Loader/>
   </div>
-  <div style="margin-top: 20px;" v-else-if="!isDayOpen" class="no-content">
-    Нет открытых дней
-  </div>
-  <div v-else class="row">
-    <div class="card">
-      <div v-for="day in dayList" :key="day._id" class="card-panel">
-        <div>Дата открытия: {{ dateFilter(day.opened_at, 'datetime') }}</div>
-        <div>Статус:
-          <router-link to="/clients">{{ day.status }}</router-link>
-        </div>
-        <div>Клиентов: {{ day.client.length }}</div>
-        <div>Программы: 6</div>
-        <div>Бар: 7</div>
-        <div><span>Закрыть:</span> <span @click.stop="closeDayById(day._id)"
-                                         class="material-icons small red-text edit-link link">close</span>
+
+  <div v-else-if="!isLoading" class="days-content-page">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card blue-grey darken-2">
+          <div class="card-content white-text">
+            <span class="card-title">{{ userGreet() }}, Пользователь.</span>
+            <span v-show="isDayOpen" class="card-title">Рабочая смена открыта.</span>
+            <span v-show="!isDayOpen" class="card-title">Открытых рабочих смен нет.</span>
+            <div v-if="!isDayOpen" class="card-action">
+              <span @click.stop="createNewDay" class="days-link">Открыть смену</span>
+            </div>
+            <p style="display: none"> Чтобы приступить к работе, необходимо открыть рабочую смену.</p>
+            <div v-for="day in dayList" :key="day._id" class="day-info">
+              <hr>
+              <h6>Инфо о смене:</h6>
+              <p>Дата начала: {{ dateFilter(day.opened_at, 'datetime') }}</p>
+              <p>Последний заказ: 02.12.2012, 15:00.</p>
+              <hr>
+              <p>Клиентов: 8</p>
+              <p>Программ: 11</p>
+              <p>Покупок по бару: 5</p>
+              <hr>
+              <p>Бар: 2650</p>
+              <p>Программы: 1500</p>
+              <h6>Итого: 4150</h6>
+              <div class="card-action">
+                <router-link to="/clients">Клиенты</router-link>
+                <span @click.stop="closeDayById(day._id)" class="days-link" v-if="isDayOpen">Заркыть смену</span>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </div>
   </div>
-  <i v-if="!isDayOpen" @click.stop="createNewDay" class="material-icons green-text small link plus">add</i>
+
 
 </template>
 
@@ -30,6 +49,7 @@ import { useStore } from 'vuex'
 import { computed, onBeforeMount, ref } from 'vue'
 import Loader from '@/components/Loader'
 import { dateFilter } from '@/utils'
+import { userGreet } from '@/utils'
 
 export default {
   components: {
@@ -37,59 +57,50 @@ export default {
   },
   setup() {
     const store = useStore()
-    const loading = ref(true)
-    const dayList = ref([])
+    const isLoading = ref(true)
+
     const isFormOpen = ref(false)
     const isEditFormOpen = ref(false)
-    const isDayOpen = ref(false)
-
-    const onDataReload = async () => {
-      await store.dispatch('DayFetchAllFromServer', 'opened')
-      dayList.value = computed(() => store.getters.dayList).value
-      isDayOpen.value = dayList.value.length > 0
-    }
+    const isDayOpen = computed(() => dayList.value.length > 0)
+    const dayList = ref(computed(() => store.getters.dayList))
 
     onBeforeMount(async () => {
-      await onDataReload()
-      loading.value = false
+      await store.dispatch('DayFetchAllFromServer', 'opened')
+      isLoading.value = false
     })
-
-    const closeFormAndReloadList = async () => {
-      await onDataReload()
-      isFormOpen.value = false
-    }
 
     const removeItemFromList = async (id) => {
       await store.dispatch('RemoveDayFromServerById', id)
-      await onDataReload()
+      await store.dispatch('DayFetchAllFromServer', 'opened')
     }
 
     const createNewDay = async () => {
       await store.dispatch('DayCreateOnServer', {})
-      await onDataReload()
+      await store.dispatch('DayFetchAllFromServer', 'opened')
     }
 
     const closeDayById = async (id) => {
-      const payload = {}
-      payload.id = id
-      payload.status = 'closed'
+      const payload = {
+        id,
+        status: 'closed'
+      }
 
       await store.dispatch('DayUpdateOnServerById', payload)
-      await onDataReload()
+      await store.dispatch('DayFetchAllFromServer', 'opened')
 
     }
 
     return {
-      loading,
+      isLoading,
       dayList,
-      closeFormAndReloadList,
       isFormOpen,
       removeItemFromList,
       isEditFormOpen,
       createNewDay,
       closeDayById,
       dateFilter,
-      isDayOpen
+      isDayOpen,
+      userGreet
     }
 
   }
@@ -119,6 +130,32 @@ export default {
     border-radius: 10px;
     margin: 10px;
     height: 100%;
+  }
+}
+
+.toast:not(.view) {
+  display: block;
+}
+
+.days-link {
+  color: #ffab40;
+  margin-right: 24px;
+  transition: color .3s ease;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    color: #ffd8a6;
+  }
+}
+
+.card-content {
+  padding: 40px;
+
+  .card-action {
+    padding-left: 0;
+    padding-top: 20px;
+    margin-top: 20px;
   }
 }
 

@@ -20,7 +20,7 @@
 <script>
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount, onUpdated, ref } from 'vue'
 import ClientProgram from '@/components/ClientProgram'
 import ClientBar from '@/components/ClientBar'
 import { dateFilter } from '@/utils'
@@ -48,8 +48,11 @@ export default {
       await store.dispatch('BarFetchAllFromServer')
       await store.dispatch('FetchEmployeeListFromServer')
       await store.dispatch('ProgramFetchAllFromServer')
-      M.AutoInit()
       isLoading.value = false
+    })
+
+    onUpdated(()=> {
+      M.AutoInit()
     })
 
     return {

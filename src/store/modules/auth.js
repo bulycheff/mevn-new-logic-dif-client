@@ -3,14 +3,14 @@ import axios from 'axios'
 
 export default {
   actions: {
-    Login: async ({ commit }, payload) => {
+    Login: async ({ commit, dispatch }, payload) => {
       try {
         const response = await axios.post(`${config.api_uri}/auth/login`, payload)
         axios.defaults.headers['Authorization'] = response.data.token
         commit('SET_USER_TO_STATE', response.data.user)
         commit('SET_TOKEN_TO_STATE', response.data.token)
-
         localStorage.token = response.data.token
+        await dispatch('DayFetchAllFromServer', 'open')
       } catch (e) {
         console.log(e.message)
       }
@@ -25,13 +25,25 @@ export default {
       delete axios.defaults.headers.common['Authorization']
     },
 
-    OnAppMounted: async ({ commit, dispatch }) => {
+    CheckTokenAndUserBeforeMountApp: async ({ commit, dispatch }) => {
       commit('SET_TOKEN_FROM_LOCAL_STORAGE')
+      let user
       if (localStorage.token) {
-        const { data: { user } } = await axios.get(`${config.api_uri}/auth/status`)
-        commit('SET_USER_TO_STATE', user)
+        try {
+          let { data: { user } } = await axios.get(`${config.api_uri}/auth/status`)
+          if (user) {
+            commit('SET_USER_TO_STATE', user)
+          } else {
+            console.log('NO USER')
+          }
+        } catch (e) {
+          console.log(e.message)
+        }
       }
-      await dispatch('DayFetchAllFromServer', 'opened')
+
+      if(user) {
+        await dispatch('DayFetchAllFromServer', 'opened')
+      }
     }
   },
   mutations: {

@@ -41,10 +41,10 @@ export default {
 }
 
 .collection a.collection-item {
-  color: #2b2b4d;
+  color: #2b2b4d !important;
 
   &.active {
-    color: white;
+    color: white !important;
   }
 }
 </style>

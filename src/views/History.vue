@@ -44,8 +44,9 @@
 
     <div class="content-block">
 
-      <div v-if="isTableEmpty" class="empty-table">
-        <h5>В выборке отсутствуют элементы. <br> Попрбуйте выбрать другие даты.</h5>
+      <div v-if="isTableEmpty" class="empty-table center">
+        <h5>В выборке отсутствуют элементы.</h5>
+        <h6>Попрбуйте выбрать другие даты.</h6>
       </div>
 
       <table v-else-if="!isTableEmpty">
@@ -54,7 +55,7 @@
           <th>Имя сотрудника</th>
           <th>Дата открытия</th>
           <th>Дата закрытия</th>
-          <th>Сумма</th>
+          <th>Итого</th>
         </tr>
         </thead>
 
@@ -71,6 +72,8 @@
     </div>
 
   </div>
+<!--  <a onclick="M.toast({html: 'I am a toast', displayLength: 4000, classes: 'rounded', opacity: 0.3})"-->
+<!--     class="btn">Toast!</a>-->
 </template>
 
 <script>
@@ -81,6 +84,7 @@ import { dateTimeFilter, formatPeriod, getLastWeekPeriod, convertDateForApiReque
 import { useRoute, useRouter } from 'vue-router'
 import Loader from '@/components/Loader'
 import Datepicker from 'vue3-date-time-picker'
+import M from 'materialize-css'
 
 export default {
   components: { Loader, Datepicker },
@@ -116,6 +120,8 @@ export default {
       if ((page > pagination.pages.length) || (!page)) {
         await router.replace('/history/1')
       }
+
+      M.AutoInit()
 
       isLoading.value = false
     })
@@ -167,12 +173,9 @@ export default {
 </script>
 
 <style lang="scss">
-@import "~vue3-date-time-picker/dist/main.css";
-
-.active {
-  background-color: #2b2b4d !important;
-  color: #dbdbdb !important;
-}
+@import "../../public/datepicker";
+@import "~materialize-css/sass/materialize";
+@import "~materialize-css/sass/components/toast";
 
 .history {
   display: flex;
@@ -187,6 +190,11 @@ export default {
   .pagination-block {
     margin-top: 20px;
     height: auto;
+
+    ul.pagination > li.active {
+      background-color: #2b2b4d !important;
+      color: #dbdbdb !important;
+    }
   }
 
 }
@@ -206,4 +214,28 @@ div.dp__main.dp__theme_light > div > .dp__input_wrap {
   width: 110%;
 }
 
+.toast {
+  &:not(.show) {
+    display: block;
+  }
+
+  border-radius: 12px !important;
+  top: 35px;
+  width: auto;
+  margin-top: 10px;
+  position: relative;
+  max-width: 100%;
+  height: auto;
+  min-height: 48px;
+  line-height: 1.5em;
+  background-color: rgb(43, 43, 77);
+  padding: 10px 25px;
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: default;
+}
 </style>
