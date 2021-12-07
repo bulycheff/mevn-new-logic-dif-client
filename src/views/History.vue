@@ -61,7 +61,7 @@
 
         <tbody v-for="day in pagination.pages[pagination.currentPage-1].days" :key="day._id">
         <tr>
-          <td>{{ day.opened_by }}</td>
+          <td>{{ day.opened_by.username }}</td>
           <td>{{ day.opened_at ? dateTimeFilter(day.opened_at) : '' }}</td>
           <td>{{ day.closed_at ? dateTimeFilter(day.closed_at) : '' }}</td>
           <td>{{ day.avgSum }}</td>
