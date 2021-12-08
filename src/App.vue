@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, onBeforeUpdate } from 'vue'
 import Navbar from '@/components/Navbar'
 import { useStore } from 'vuex'
 import router from '@/router'
@@ -24,7 +24,13 @@ export default {
       }
       if(!store.getters.user) {
         await router.replace('/login')
+      } else {
+        await store.dispatch('DayFetchAllFromServer', 'opened')
       }
+    })
+
+    onBeforeUpdate(async () => {
+      await store.dispatch('DayFetchAllFromServer', 'opened')
     })
 
     return {}
