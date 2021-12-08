@@ -44,7 +44,7 @@ export default {
         if (store.getters.isAuth) {
           form.username = ''
           form.password = ''
-          await router.push('/')
+          await router.push('/days')
           console.log('Вход в систему')
         } else {
           console.log('Неверная пара логин/пароль')
