@@ -3,53 +3,48 @@
   <Loader v-if="isLoading"/>
 
   <div v-else-if="!isLoading" class="content">
-    <ul class="collapsible">
-      <li>
-        <div class="collapsible-header">
-          <i class="material-icons-sharp icon-font">paid</i>
-          <span>Внесение трат</span>
-        </div>
-        <div class="card-content collapsible-body">
-          <table>
-            <thead>
-            <tr>
-              <th></th>
-              <th>Дата</th>
-              <th>Категория трат</th>
-              <th>Сумма</th>
-              <th></th>
-            </tr>
-            </thead>
 
-            <tbody>
-            <tr v-for="item in expense_list" :key="item._id">
-              <td>#</td>
-              <td>{{ dateFilter(item.opened_at, 'datetime') }}</td>
-              <td>{{ item.category_name }}</td>
-              <td>{{ item.value }} ₽</td>
-              <td>
-                <span @click.stop="deleteItemById(item._id)" class="material-icons-round link">delete_outline</span>
-              </td>
-            </tr>
+    <div class="expense-header">
+      <span class="material-icons-sharp icon-font expense-header__text first">paid</span>
+      <span class="expense-header__text second">Внесение трат</span>
+    </div>
 
-            </tbody>
-          </table>
-          <br>
-          <i class="material-icons small link">add</i>
-          <ExpenseAdd/>
-        </div>
-      </li>
-    </ul>
+    <table>
+      <thead>
+      <tr>
+        <th>Дата</th>
+        <th>Категория трат</th>
+        <th>Сумма</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr v-for="row in expense_list" :key="row._id">
+        <td>{{dateFilter(row.opened_at, 'datetime')}}</td>
+        <td>{{row.category.name}}</td>
+        <td>{{row.value}} ₽</td>
+      </tr>
+
+      </tbody>
+    </table>
+
+    <br>
+    <i v-if="!addExpenseActive"  @click.stop="addExpenseActive = !addExpenseActive" class="material-icons small link">add</i>
+    <div v-else-if="addExpenseActive">
+      <i @click.stop="addExpenseActive = !addExpenseActive" class="material-icons small link">remove</i>
+      <ExpenseAdd @close-form-and-reload-list="closeFormAndReloadData"/>
+    </div>
+
+
   </div>
 
 </template>
 
 <script>
-import { computed, onBeforeMount, onUpdated, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { useStore } from 'vuex'
 import { dateFilter } from '@/utils'
 import ExpenseAdd from '@/components/ExpenseAdd'
-import M from 'materialize-css'
 import Loader from '@/components/Loader'
 
 export default {
@@ -58,31 +53,24 @@ export default {
     const store = useStore()
     const isLoading = ref(true)
     const category_list = ref(computed(() => store.getters.CAT_itemList))
-    let expense_list = ref()
+    const expense_list = computed(() => store.getters.expenseList)
+    const addExpenseActive = ref(false)
+
 
     onBeforeMount(async () => {
+      await store.dispatch('DayFetchAllFromServer', 'opened')
       await store.dispatch('EXPENSE_FETCH_ALL')
       await store.dispatch('CAT_FetchAll', { apiPath: 'base/cat' })
-      expense_list = computed(() => {
-        return store.getters.expenseList.map(item => {
-          let obj = new Object(item)
-          obj.category_name = category_list.value.filter(cat_item => cat_item._id === item.category)[0].name
-          return obj
-        })
-      })
       isLoading.value = false
-    })
-
-
-    let instance = ref()
-    let elems = ref()
-    onUpdated(()=> {
-      elems.value = document.querySelectorAll('.collapsible')
-      M.Collapsible.init(elems.value)
     })
 
     async function deleteItemById(id) {
       await store.dispatch('EXPENSE_DELETE_BY_ID', id)
+    }
+
+    async function closeFormAndReloadData() {
+      addExpenseActive.value = false
+      await store.dispatch('EXPENSE_FETCH_ALL')
     }
 
     return {
@@ -91,8 +79,8 @@ export default {
       category_list,
       deleteItemById,
       isLoading,
-      instance,
-      elems
+      addExpenseActive,
+      closeFormAndReloadData
     }
   }
 }
@@ -119,8 +107,29 @@ export default {
   }
 }
 
-.icon-font {
-  color: #2b2b4d;
-  padding-right: 40px;
+
+.expense-header {
+  vertical-align: baseline;
+  box-sizing: inherit;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  font-size: 2.5rem;
+
+  .expense-header__text {
+    color: #2b2b4d;
+    font-size: 3rem;
+    padding: 0;
+    align-items: center;
+    height: 100%;
+    vertical-align: center;
+
+    &.second {
+      font-size: 2.1rem;
+      font-weight: 300;
+    }
+
+  }
+
 }
 </style>

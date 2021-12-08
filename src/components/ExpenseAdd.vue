@@ -20,8 +20,8 @@ import { useStore } from 'vuex'
 import { computed, reactive } from 'vue'
 
 export default {
-
-  setup() {
+  emits: ['close-form-and-reload-list'],
+  setup(_, { emit }) {
     const store = useStore()
 
     const form = reactive({
@@ -31,15 +31,19 @@ export default {
     const catList = computed(() => store.getters.CAT_itemList)
     const selectedCat = computed(() => catList.value.filter(item => item.name === form.category)[0])
 
+    const day_id = store.getters.openedDayId
     const data2send = computed(() => ({
       category: selectedCat.value._id,
-      value: form.value
+      value: form.value,
+      day_id
     }))
 
     const reg_expense = async () => {
+
       await store.dispatch('EXPENSE_CREATE_ONE', data2send.value)
       form.value = 0
       form.category = 'Категория расхода'
+      emit('close-form-and-reload-list')
     }
 
 
