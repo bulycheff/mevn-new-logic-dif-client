@@ -2,6 +2,10 @@ import { ref } from 'vue'
 
 function dateFilter(value, format = 'date') {
 
+  if((value===null)||value===undefined) {
+    return '-'
+  }
+
   // console.log(value)
   const options = {}
 
