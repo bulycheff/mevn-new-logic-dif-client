@@ -18,16 +18,16 @@
             <div v-for="day in dayList" :key="day._id" class="day-info">
               <hr>
               <h6>Инфо о смене:</h6>
-              <p>Дата начала: {{ dateFilter(day.opened_at, 'datetime') }}</p>
-              <p>Последний заказ: 02.12.2012, 15:00.</p>
+              <p>Дата начала: {{ dateFilter(dayInfo.opened_at, 'datetime') }}</p>
+              <p>Последний заказ: {{ dateFilter(dayInfo.last, 'datetime') }}</p>
               <hr>
-              <p>Клиентов: 8</p>
-              <p>Программ: 11</p>
-              <p>Покупок по бару: 5</p>
+              <p>Клиентов: {{dayInfo.clients}}</p>
+              <p>Программ: {{dayInfo.programs.value}}</p>
+              <p>Покупок по бару: {{dayInfo.bars.value}}</p>
               <hr>
-              <p>Бар: 2650</p>
-              <p>Программы: 1500</p>
-              <h6>Итого: 4150</h6>
+              <p>Программы: {{dayInfo.programs.sum}}</p>
+              <p>Бар: {{dayInfo.bars.sum}}</p>
+              <h6>Итого: {{dayInfo.total.sum}}</h6>
               <div class="card-action">
                 <router-link to="/clients">Клиенты</router-link>
                 <span @click.stop="closeDayById(day._id)" class="days-link" v-if="isDayOpen">Заркыть смену</span>
@@ -63,9 +63,11 @@ export default {
     const isEditFormOpen = ref(false)
     const isDayOpen = computed(() => dayList.value.length > 0)
     const dayList = ref(computed(() => store.getters.dayList))
+    const dayInfo = ref(computed(()=>store.getters.dayAgrInfo))
 
     onBeforeMount(async () => {
       await store.dispatch('DayFetchAllFromServer', 'opened')
+      await store.dispatch('DayAgrInfoAboutById')
       isLoading.value = false
     })
 
@@ -100,7 +102,8 @@ export default {
       closeDayById,
       dateFilter,
       isDayOpen,
-      userGreet
+      userGreet,
+      dayInfo
     }
 
   }
