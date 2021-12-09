@@ -28,9 +28,9 @@
               <p>Программы: {{ dayInfo.programs.sum }}</p>
               <p>Бар: {{ dayInfo.bars.sum }}</p>
               <h6>Итого: {{ dayInfo.total.sum }}</h6>
-              <div class="card-action">
-                <router-link to="/clients">Клиенты</router-link>
-                <span @click.stop="closeDayById(day._id)" class="days-link" v-if="isDayOpen">Заркыть смену</span>
+              <div class="card-action links-card">
+                <div><router-link to="/clients">Клиенты</router-link></div>
+                <div @click.stop="closeDayById(day._id)" class="days-link" v-if="isDayOpen">Заркыть смену</div>
               </div>
             </div>
 
@@ -164,6 +164,10 @@ export default {
     padding-top: 20px;
     margin-top: 20px;
   }
+}
+
+.card-action.links-card {
+  display: flex;
 }
 
 </style>
