@@ -8,7 +8,7 @@
       <div class="col s12 m6">
         <div class="card blue-grey darken-2">
           <div class="card-content white-text">
-            <span class="card-title">{{ userGreet() }}, Пользователь.</span>
+            <span class="card-title">{{ userGreet() }}, {{ name }}.</span>
             <span v-show="isDayOpen" class="card-title">Рабочая смена открыта.</span>
             <span v-show="!isDayOpen" class="card-title">Открытых рабочих смен нет.</span>
             <div v-if="!isDayOpen" class="card-action">
@@ -21,13 +21,13 @@
               <p>Дата начала: {{ dateFilter(dayInfo.opened_at, 'datetime') }}</p>
               <p>Последний заказ: {{ dateFilter(dayInfo.last, 'datetime') }}</p>
               <hr>
-              <p>Клиентов: {{dayInfo.clients}}</p>
-              <p>Программ: {{dayInfo.programs.value}}</p>
-              <p>Покупок по бару: {{dayInfo.bars.value}}</p>
+              <p>Клиентов: {{ dayInfo.clients }}</p>
+              <p>Программ: {{ dayInfo.programs.value }}</p>
+              <p>Покупок по бару: {{ dayInfo.bars.value }}</p>
               <hr>
-              <p>Программы: {{dayInfo.programs.sum}}</p>
-              <p>Бар: {{dayInfo.bars.sum}}</p>
-              <h6>Итого: {{dayInfo.total.sum}}</h6>
+              <p>Программы: {{ dayInfo.programs.sum }}</p>
+              <p>Бар: {{ dayInfo.bars.sum }}</p>
+              <h6>Итого: {{ dayInfo.total.sum }}</h6>
               <div class="card-action">
                 <router-link to="/clients">Клиенты</router-link>
                 <span @click.stop="closeDayById(day._id)" class="days-link" v-if="isDayOpen">Заркыть смену</span>
@@ -63,7 +63,8 @@ export default {
     const isEditFormOpen = ref(false)
     const isDayOpen = computed(() => dayList.value.length > 0)
     const dayList = ref(computed(() => store.getters.dayList))
-    const dayInfo = ref(computed(()=>store.getters.dayAgrInfo))
+    const dayInfo = ref(computed(() => store.getters.dayAgrInfo))
+    const name = computed(() => store.getters.user.name)
 
     onBeforeMount(async () => {
       await store.dispatch('DayFetchAllFromServer', 'opened')
@@ -74,11 +75,13 @@ export default {
     const removeItemFromList = async (id) => {
       await store.dispatch('RemoveDayFromServerById', id)
       await store.dispatch('DayFetchAllFromServer', 'opened')
+      await store.dispatch('DayAgrInfoAboutById')
     }
 
     const createNewDay = async () => {
       await store.dispatch('DayCreateOnServer', {})
       await store.dispatch('DayFetchAllFromServer', 'opened')
+      await store.dispatch('DayAgrInfoAboutById')
     }
 
     const closeDayById = async (id) => {
@@ -103,7 +106,8 @@ export default {
       dateFilter,
       isDayOpen,
       userGreet,
-      dayInfo
+      dayInfo,
+      name
     }
 
   }
