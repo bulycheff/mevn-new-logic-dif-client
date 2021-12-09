@@ -8,18 +8,8 @@ export default {
       commit('CLIENT_SET_LIST', data)
     },
     ClientFetchAgrByDayId: async ({ commit }, dayId) => {
+      console.log(`dayId = ${dayId}`)
       const { data: clients } = await axios.get(`${config.api_uri}/client/agr?dayId=${dayId}`)
-
-      // let ids = [...new Set(clients.map(item => item._id))].map(id => ({ _id: id }))
-      let arr = clients.reduce((acc, obj, idx) => {
-        let key = obj[idx]
-        console.log(key)
-      }, [])
-
-      console.log(arr)
-
-      // let ids = [...new Set(clients.map(item => item._id))].map(id => ({ _id: id }))
-      // console.log(ids)
 
       commit('CLIENT_SET_AGR_LIST_BY_DAY_ID', clients)
     },
@@ -51,6 +41,7 @@ export default {
   getters: {
     clientList: state => state.clientList,
     clientToEdit: state => state.clientToEdit,
+    agrClientList: state => state.agrClientList
   },
   state: {
     clientList: [],

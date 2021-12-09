@@ -9,23 +9,23 @@
         <table>
           <thead>
           <tr>
-            <th>#</th>
             <th>Имя клиента</th>
-            <th>Дата начала</th>
-            <th>Сумма</th>
+            <th>Программы</th>
+            <th>Бар</th>
+            <th>Тотал</th>
           </tr>
           </thead>
 
           <tbody>
           <tr v-for="cl in clients" :key="cl._id">
-            <td>#</td>
             <td>
               <router-link :to="`/client/${cl._id}`">
                 {{ cl.name }}
               </router-link>
             </td>
-            <td>{{ dateFilter(cl.opened_at, 'datetime') }}</td>
-            <td>{{ cl.closed_at }}</td>
+            <td>{{cl.program}}</td>
+            <td>{{cl.bar}}</td>
+            <td>{{cl.total}}</td>
           </tr>
           </tbody>
         </table>
@@ -84,7 +84,8 @@ export default {
       isLoading,
       openedDayId: computed(() => store.getters.openedDayId),
       isDayOpen: computed(() => store.getters.isDayOpen),
-      clients: computed(() => store.getters.clientList),
+      clients: computed(() => store.getters.agrClientList),
+      newClients: computed(()=> store.getters.agrClientList),
       isAddFormOpen,
       closeFormAndReloadData,
       openedDay,
