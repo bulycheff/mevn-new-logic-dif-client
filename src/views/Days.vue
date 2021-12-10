@@ -68,7 +68,9 @@ export default {
 
     onBeforeMount(async () => {
       await store.dispatch('DayFetchAllFromServer', 'opened')
-      await store.dispatch('DayAgrInfoAboutById')
+      if(store.getters.openedDayId!==null){
+        await store.dispatch('DayAgrInfoAboutById')
+      }
       isLoading.value = false
     })
 

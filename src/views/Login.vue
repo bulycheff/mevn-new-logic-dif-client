@@ -38,7 +38,7 @@ export default {
       password: ''
     })
 
-    const submitHandler = async function () {
+    async function submitHandler () {
       try {
         await store.dispatch('Login', form)
         if (store.getters.isAuth) {
